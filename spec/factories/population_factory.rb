@@ -23,6 +23,16 @@ FactoryBot.define do
       population { 76_212_168 }
     end
 
+    trait :_1950 do
+      year { 1950 }
+      population { 151_325_798 }
+    end
+
+    trait :_1960 do
+      year { 1960 }
+      population { 179_323_175 }
+    end
+
     trait :_1990 do
       year { 1990 }
       population { 248_709_873 }

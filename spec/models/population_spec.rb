@@ -61,6 +61,15 @@ RSpec.describe Population, type: :model do
       it 'returns zero' do
         expect(described_class.get(1972)).to be_zero
       end
+
+      describe '.approximate is not called' do
+        before { FactoryBot.create(:population, :_1900) }
+
+        it 'unless year is between two other years' do
+          expect(described_class).to_not receive(:approximate)
+          described_class.get(1955)
+        end
+      end
     end
 
     context 'with some populations' do
@@ -78,13 +87,6 @@ RSpec.describe Population, type: :model do
         end
       end
 
-      it 'accepts an unknown year and returns previous known population' do
-        aggregate_failures do
-          expect(described_class.get(1902)).to eq(76_212_168)
-          expect(described_class.get(1908)).to eq(76_212_168)
-        end
-      end
-
       it 'accepts a year that is before earliest known and returns zero' do
         aggregate_failures do
           expect(described_class.get(1800)).to eq(0)
@@ -98,6 +100,21 @@ RSpec.describe Population, type: :model do
           expect(described_class.get(2000)).to eq(248_709_873)
           expect(described_class.get(200_000)).to eq(248_709_873)
         end
+      end
+    end
+  end
+
+  describe '.approximate' do
+    before do
+      FactoryBot.create(:population, :_1950)
+      FactoryBot.create(:population, :_1960)
+    end
+
+    it 'returns an approximate population value' do
+      aggregate_failures do
+        expect(described_class.approximate(1951)).to eq(154_125_535)
+        expect(described_class.approximate(1955)).to eq(165_324_486)
+        expect(described_class.approximate(1959)).to eq(176_523_437)
       end
     end
   end
