@@ -94,13 +94,6 @@ RSpec.describe Population, type: :model do
           expect(described_class.get(-1000)).to eq(0)
         end
       end
-
-      it 'accepts a year after latest known and returns latest known population' do
-        aggregate_failures do
-          expect(described_class.get(2000)).to eq(248_709_873)
-          expect(described_class.get(200_000)).to eq(248_709_873)
-        end
-      end
     end
   end
 
@@ -116,6 +109,38 @@ RSpec.describe Population, type: :model do
         expect(described_class.approximate(1955)).to eq(165_324_486)
         expect(described_class.approximate(1959)).to eq(176_523_437)
       end
+    end
+  end
+
+  describe '.clamp_year' do
+    it 'returns nil' do
+      expect(described_class.clamp_year(nil)).to_not be
+    end
+
+    it 'returns a clamped value' do
+      aggregate_failures do
+        expect(described_class.clamp_year(-1)).to eq(0)
+        expect(described_class.clamp_year(1990)).to eq(1990)
+        expect(described_class.clamp_year(2501)).to eq(2500)
+      end
+    end
+  end
+
+  describe '.exponential' do
+    before { FactoryBot.create(:population, :_1990) }
+
+    it 'returns an approximate population value' do
+      aggregate_failures do
+        expect(described_class.exponential(1991)).to eq(271_093_761)
+        expect(described_class.exponential(2345)).to eq(4_809_498_399_058_283_144_488)
+        expect(described_class.exponential(2500)).to eq(3_042_334_520_670_978_197_473_469_736)
+      end
+    end
+  end
+
+  describe 'MAX_YEAR' do
+    it 'returns 2500' do
+      expect(Population::MAX_YEAR).to eq(2500)
     end
   end
 end
