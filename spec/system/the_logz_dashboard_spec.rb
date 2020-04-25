@@ -10,6 +10,7 @@ RSpec.describe 'The Logz Dashboard', type: :system do
       allow(log).to receive(:query).and_return('1990')
       allow(log).to receive(:answer).and_return('248709873')
       allow(log).to receive(:created_at).and_return(now)
+      allow_any_instance_of(ApplicationHelper).to receive(:exact_or_calculated).and_return('exact')
       visit the_logz_path
     end
 
@@ -18,6 +19,7 @@ RSpec.describe 'The Logz Dashboard', type: :system do
         expect(page).to have_css('td', text: '1990')
         expect(page).to have_css('td', text: '248709873')
         expect(page).to have_css('td', text: now)
+        expect(page).to have_css('td', text: 'exact')
       end
     end
   end

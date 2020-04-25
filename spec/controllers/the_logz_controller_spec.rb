@@ -10,13 +10,17 @@ RSpec.describe TheLogzController, type: :controller do
     end
 
     context 'with data' do
-      before { FactoryBot.create(:log, :_1990) }
+      before do
+        FactoryBot.create(:population, :_1990)
+        FactoryBot.create(:log, :_1990)
+      end
 
       it 'returns http success' do
         get :index
         aggregate_failures do
           expect(response.body).to include('1990')
           expect(response.body).to include('248709873')
+          expect(response.body).to include('exact')
         end
       end
     end
