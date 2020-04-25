@@ -13,6 +13,8 @@ class Population < ApplicationRecord
   end
 
   def self.get(year)
+    return 0 unless year
+
     min = Population.min
     return 0 if min.nil? || year < min.year
 

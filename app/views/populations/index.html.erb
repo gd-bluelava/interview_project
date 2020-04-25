@@ -1,5 +1,9 @@
 <h1>Get your population numbers here</h1>
-<form method="get" action="populations/by_year">
-  <input name="year" />
+<form method="get">
+  <input name="year" value="<%= @year %>" />
   <button type="submit">Submit</button>
 </form>
+
+<% if @year %>
+<%= render partial: 'results' %>
+<% end %>
