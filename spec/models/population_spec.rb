@@ -160,4 +160,15 @@ RSpec.describe Population, type: :model do
       end
     end
   end
+
+  describe '#years' do
+    before do
+      FactoryBot.create(:population, :_1990)
+      FactoryBot.create(:population, :_1991)
+    end
+
+    it 'returns population years' do
+      expect(described_class.years).to eq([1990, 1991])
+    end
+  end
 end

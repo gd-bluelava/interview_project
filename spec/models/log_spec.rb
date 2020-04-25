@@ -24,4 +24,15 @@ RSpec.describe Log, type: :model do
       end
     end
   end
+
+  describe '#for_dashboard' do
+    before do
+      FactoryBot.create(:log, :_1990)
+      FactoryBot.create(:log)
+    end
+
+    it 'returns logs with non-blank queries' do
+      expect(Log.for_dashboard.size).to eq(1)
+    end
+  end
 end
