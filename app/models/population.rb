@@ -1,4 +1,6 @@
 class Population < ApplicationRecord
+  MAX_YEAR = 2500
+
   validates :year, :population,
             numericality: { only_integer: true,
                             greater_than_or_equal_to: 0 }
@@ -21,14 +23,27 @@ class Population < ApplicationRecord
     pop = Population.find_by(year: year)
     unless pop
       max = Population.max
-
-      return Population.approximate(year) if max && year.between?(min.year, max.year)
+      if max
+        return Population.exponential(year) if year > max.year
+        return Population.approximate(year) if year.between?(min.year, max.year)
+      end
 
       pop = max if max && year > max.year
       pop = min if pop.nil? && min && year > min.year
     end
 
     pop&.population
+  end
+
+  def self.exponential(year)
+    p = Population.max
+    p_year = p.year
+    population = p.population
+    while p_year < year
+      p_year += 1
+      population += (population * 0.09).to_i
+    end
+    population
   end
 
   def self.approximate(year)
@@ -40,5 +55,13 @@ class Population < ApplicationRecord
     per_year = (after.population - before.population) / years.to_f
 
     before.population + ((year - before.year) * per_year).to_i
+  end
+
+  def self.clamp_year(year)
+    return unless year.present?
+
+    y = year.to_i
+    y = 0 if y.negative?
+    y > MAX_YEAR ? MAX_YEAR : y
   end
 end

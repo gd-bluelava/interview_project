@@ -1,6 +1,6 @@
 class PopulationsController < ApplicationController
   def index
-    @year = params[:year].to_i if params[:year]
+    @year = Population.clamp_year(params[:year])
     @population = Population.get(@year)
   end
 end
