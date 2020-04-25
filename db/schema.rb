@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_24_004636) do
+ActiveRecord::Schema.define(version: 2020_04_25_123144) do
+
+  create_table "logs", force: :cascade do |t|
+    t.string "query", null: false
+    t.string "answer", null: false
+    t.datetime "created_at"
+    t.index ["answer"], name: "index_logs_on_answer"
+    t.index ["query"], name: "index_logs_on_query"
+  end
 
   create_table "populations", force: :cascade do |t|
     t.integer "population"
