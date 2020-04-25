@@ -140,7 +140,24 @@ RSpec.describe Population, type: :model do
 
   describe 'MAX_YEAR' do
     it 'returns 2500' do
-      expect(Population::MAX_YEAR).to eq(2500)
+      expect(described_class::MAX_YEAR).to eq(2500)
+    end
+  end
+
+  describe '#exact_queries' do
+    let(:result) { described_class.exact_queries[0] }
+
+    before do
+      FactoryBot.create(:population, :_1990)
+      FactoryBot.create_list(:log, 2, :_1990)
+    end
+
+    it 'returns populations with logs counts using a join on year' do
+      aggregate_failures do
+        expect(result.year).to eq(1990)
+        expect(result.population).to eq(248_709_873)
+        expect(result.queries).to eq(2)
+      end
     end
   end
 end

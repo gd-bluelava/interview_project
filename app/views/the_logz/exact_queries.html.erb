@@ -1,0 +1,26 @@
+<%= render partial: 'shared/menu' %>
+
+<h1>The Logz Dashboard</h1>
+
+<h2>Exact Queries</h2>
+
+<%= render partial: 'menu' %>
+
+<table>
+  <thead>
+  <tr>
+    <th>Year</th>
+    <th>Population</th>
+    <th>Queries</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @populations.each do |population| %>
+    <tr>
+      <td><%= population.year %></td>
+      <td><%= population.population %></td>
+      <td><%= population.queries %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

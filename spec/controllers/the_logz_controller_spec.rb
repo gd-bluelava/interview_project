@@ -25,4 +25,27 @@ RSpec.describe TheLogzController, type: :controller do
       end
     end
   end
+
+  describe 'GET #exact_queries' do
+    it 'returns http success' do
+      get :exact_queries
+      expect(response).to be_successful
+    end
+
+    context 'with data' do
+      before do
+        FactoryBot.create(:population, :_1990)
+        FactoryBot.create_list(:log, 2, :_1990)
+      end
+
+      it 'returns http success' do
+        get :exact_queries
+        aggregate_failures do
+          expect(response.body).to include('1990')
+          expect(response.body).to include('248709873')
+          expect(response.body).to include('<td>2</td>')
+        end
+      end
+    end
+  end
 end

@@ -6,6 +6,12 @@ class Population < ApplicationRecord
                             greater_than_or_equal_to: 0 }
   validates :year, uniqueness: true
 
+  scope :exact_queries, lambda {
+    select('populations.*', 'COUNT(logs.id) AS queries')
+      .joins('LEFT JOIN logs ON populations.year = logs.query')
+      .group('populations.id')
+  }
+
   def self.min
     Population.order(:year).first
   end
