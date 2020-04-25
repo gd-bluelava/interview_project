@@ -1,8 +1,6 @@
 class PopulationsController < ApplicationController
-  def index; end
-
-  def show
-    @year = params[:year].to_i
+  def index
+    @year = params[:year].to_i if params[:year]
     @population = Population.get(@year)
   end
 end
