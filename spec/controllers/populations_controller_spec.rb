@@ -12,7 +12,7 @@ RSpec.describe PopulationsController, type: :controller do
 
   describe 'GET #show' do
     before do
-      allow(Population).to receive(:get).with('1900').and_return(76_212_168)
+      allow(Population).to receive(:get).with(1900).and_return(76_212_168)
     end
 
     it 'returns http success' do
