@@ -1,0 +1,19 @@
+
+<% @logs.each do |log| %>
+  <tr>
+    <td><%= log.query %></td>
+    <td><%= log.answer %></td>
+    <td><%= exact_or_calculated(@years, log.query) %></td>
+    <td><%= log.created_at %></td>
+  </tr>
+<% end %>
+
+<script>
+  $(function() {
+    setTimeout(function(){
+      $.ajax({
+        url: '<%= update_population_queries_path %>'
+      });
+    }, 10000);
+  });
+</script>

@@ -12,6 +12,10 @@ class Population < ApplicationRecord
       .group('populations.id')
   }
 
+  scope :years, lambda {
+    select(:year).collect(&:year)
+  }
+
   def self.min
     Population.order(:year).first
   end
