@@ -3,10 +3,40 @@
 <h1>Get your population numbers here</h1>
 
 <form method="get">
-  <input name="year" value="<%= @year %>" />
-  <button type="submit">Submit</button>
+  <p>
+    Year: <input name="year" value="<%= @year %>" />
+    <button type="submit">Submit</button>
+  </p>
+  <p id="model-options">
+    <input type="radio" name="model" id="Logistical" value="Logistical"<%= model_checked('Logistical', params) %>> Logistical
+    <input type="radio" name="model" id="Exponential" value="Exponential"<%= model_checked('Exponential', params) %>> Exponential
+  </p>
 </form>
 
 <% if @year %>
 <%= render partial: 'results' %>
 <% end %>
+
+<script>
+  $(function() {
+    const year_field = $('input[name=year]');
+    showHideModelOptions(year_field.val());
+    year_field.on('change', function (event) {
+      showHideModelOptions(event.target.value);
+    });
+  });
+
+  function showHideModelOptions(field_value) {
+    if(field_value > 1990) {
+      $('#model-options').show();
+      if(!$('input[value=Exponential]').prop('checked')) {
+        $('input[value=Logistical]').prop('checked', true);
+      }
+    } else {
+      $('#model-options').hide();
+      $.each($('input[name=model]'), function (k, v) {
+        $(v).prop('checked', false);
+      });
+    }
+  }
+</script>

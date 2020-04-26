@@ -4,16 +4,23 @@
     <td><%= log.query %></td>
     <td><%= log.answer %></td>
     <td><%= exact_or_calculated(@years, log.query) %></td>
+    <td><%= Population::ALGOS[log.algo || 0] %></td>
     <td><%= log.created_at %></td>
   </tr>
 <% end %>
 
 <script>
+  window.timeOut = null;
+
   $(function() {
-    setTimeout(function(){
+    window.timeOut = setTimeout( function(){
       $.ajax({
         url: '<%= update_population_queries_path %>'
       });
     }, 10000);
   });
+
+  window.onunload = function() {
+    clearTimeout(window.timeOut);
+  }
 </script>

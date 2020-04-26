@@ -1,6 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe Population, type: :model do
+  describe 'MAX_YEAR' do
+    it 'returns 2500' do
+      expect(described_class::MAX_YEAR).to eq(2500)
+    end
+  end
+
+  describe 'ALGOS' do
+    it 'returns a list of algorithms' do
+      expect(described_class::ALGOS).to eq(%w[None Logistical Exponential])
+    end
+  end
+
   context 'invalid' do
     describe 'negative data' do
       let(:population) { FactoryBot.build(:population, :invalid_negatives) }
@@ -59,7 +71,7 @@ RSpec.describe Population, type: :model do
   describe '.get' do
     context 'with no populations' do
       it 'returns zero' do
-        expect(described_class.get(1972)).to be_zero
+        expect(described_class.get(1972, nil)).to be_zero
       end
 
       describe '.approximate is not called' do
@@ -67,7 +79,25 @@ RSpec.describe Population, type: :model do
 
         it 'unless year is between two other years' do
           expect(described_class).to_not receive(:approximate)
-          described_class.get(1955)
+          described_class.get(1955, nil)
+        end
+      end
+
+      describe '.exponential is called' do
+        before { FactoryBot.create(:population, :_1990) }
+
+        it 'when year is after max know year and Exponential is chosen' do
+          expect(described_class).to receive(:exponential)
+          described_class.get(2000, 'Exponential')
+        end
+      end
+
+      describe '.logistical is called' do
+        before { FactoryBot.create(:population, :_1990) }
+
+        it 'when year is after max know year and Logistical is chosen' do
+          expect(described_class).to receive(:logistical)
+          described_class.get(2000, 'Logistical')
         end
       end
     end
@@ -82,16 +112,16 @@ RSpec.describe Population, type: :model do
 
       it 'accepts a known year and returns correct population' do
         aggregate_failures do
-          expect(described_class.get(1900)).to eq(76_212_168)
-          expect(described_class.get(1990)).to eq(248_709_873)
+          expect(described_class.get(1900, nil)).to eq(76_212_168)
+          expect(described_class.get(1990, nil)).to eq(248_709_873)
         end
       end
 
       it 'accepts a year that is before earliest known and returns zero' do
         aggregate_failures do
-          expect(described_class.get(1800)).to eq(0)
-          expect(described_class.get(0)).to eq(0)
-          expect(described_class.get(-1000)).to eq(0)
+          expect(described_class.get(1800, nil)).to eq(0)
+          expect(described_class.get(0, nil)).to eq(0)
+          expect(described_class.get(-1000, nil)).to eq(0)
         end
       end
     end
@@ -129,7 +159,7 @@ RSpec.describe Population, type: :model do
   describe '.exponential' do
     before { FactoryBot.create(:population, :_1990) }
 
-    it 'returns an approximate population value' do
+    it 'returns an exponentially calculated population value' do
       aggregate_failures do
         expect(described_class.exponential(1991)).to eq(271_093_761)
         expect(described_class.exponential(2345)).to eq(4_809_498_399_058_283_144_488)
@@ -138,9 +168,18 @@ RSpec.describe Population, type: :model do
     end
   end
 
-  describe 'MAX_YEAR' do
-    it 'returns 2500' do
-      expect(described_class::MAX_YEAR).to eq(2500)
+  describe '.logistic' do
+    before { FactoryBot.create(:population, :_1990) }
+
+    it 'returns a logistically calculated population value' do
+      aggregate_failures do
+        expect(described_class.logistical(1991)).to eq(265_217_999)
+        expect(described_class.logistical(2000)).to eq(413_647_198)
+        expect(described_class.logistical(2010)).to eq(563_656_435)
+        expect(described_class.logistical(2025)).to eq(690_795_856)
+        expect(described_class.logistical(2050)).to eq(743_285_779)
+        expect(described_class.logistical(2099)).to eq(749_917_659)
+      end
     end
   end
 

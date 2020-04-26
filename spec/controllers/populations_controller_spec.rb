@@ -16,10 +16,10 @@ RSpec.describe PopulationsController, type: :controller do
 
     context 'with data' do
       before do
-        allow(Population).to receive(:get).with(1900).and_return(76_212_168)
+        allow(Population).to receive(:get).with(1900, nil).and_return(76_212_168)
       end
 
-      it 'returns a population for a date' do
+      it 'returns a population for a known year' do
         get :index, params: { year: 1900 }
         aggregate_failures do
           expect(response.content_type).to eq('text/html')
