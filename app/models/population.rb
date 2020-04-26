@@ -1,15 +1,16 @@
 class Population < ApplicationRecord
   MAX_YEAR = 2500
+  ALGOS = %w[None Logistical Exponential].freeze
 
   validates :year, :population,
-            numericality: { only_integer: true,
-                            greater_than_or_equal_to: 0 }
+            numericality: {only_integer: true,
+                           greater_than_or_equal_to: 0}
   validates :year, uniqueness: true
 
   scope :exact_queries, lambda {
     select('populations.*', 'COUNT(logs.id) AS queries')
-      .joins('LEFT JOIN logs ON populations.year = logs.query')
-      .group('populations.id')
+        .joins('LEFT JOIN logs ON populations.year = logs.query::integer')
+        .group('populations.id')
   }
 
   scope :years, lambda {
@@ -24,7 +25,7 @@ class Population < ApplicationRecord
     Population.order(year: :desc).first
   end
 
-  def self.get(year)
+  def self.get(year, model)
     return 0 unless year
 
     min = Population.min
@@ -34,8 +35,11 @@ class Population < ApplicationRecord
     unless pop
       max = Population.max
       if max
-        return Population.exponential(year) if year > max.year
-        return Population.approximate(year) if year.between?(min.year, max.year)
+        if year > max.year
+          return model == 'Exponential' ? Population.exponential(year) : Population.logistical(year)
+        else
+          return Population.approximate(year) if year.between?(min.year, max.year)
+        end
       end
 
       pop = max if max && year > max.year
@@ -43,6 +47,19 @@ class Population < ApplicationRecord
     end
 
     pop&.population
+  end
+
+  def self.logistical(year)
+    p = Population.max
+    p0 = p.population
+
+    t = year - p.year
+    k = 750_000_000
+    r = 0.09
+
+    # https://www.fxsolver.com/browse/formulas/Population+growth+rate+-+Logistic+equation
+    pop = k / (1 + (((k - p0) / p0) * Math.exp(-r * t)))
+    pop.to_i
   end
 
   def self.exponential(year)

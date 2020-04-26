@@ -35,4 +35,14 @@ RSpec.describe Log, type: :model do
       expect(Log.for_dashboard.size).to eq(1)
     end
   end
+
+  describe '#log!' do
+    it 'does not log a blank year query' do
+      expect { Log.log!(1, {}) }.to_not change(Log, :count)
+    end
+
+    it 'logs a valid query' do
+      expect { Log.log!(1, {year: 1990}) }.to change(Log, :count).by(1)
+    end
+  end
 end
